@@ -1,69 +1,71 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Categories } from 'src/entities/categories.entity';
+import { Products } from 'src/entities/products.entity';
+import { Repository } from 'typeorm';
+import * as data from '../utils/data.json';
 
-type Product = {
-  id: string;
-
-  name: string;
-
-  description: string;
-
-  price: number;
-
-  stock: boolean;
-
-  imgUrl: string;
-};
-
-const products: Product[] = [
-  {
-    id: 'p1',
-    name: 'Fender Stratocaster',
-    description:
-      'Guitarra eléctrica icónica con cuerpo de aliso, mástil de arce y tres pastillas simples.',
-    price: 1299.99,
-    stock: true,
-    imgUrl: 'https://example.com/images/fender-stratocaster.jpg',
-  },
-  {
-    id: 'p2',
-    name: 'Yamaha P-125',
-    description:
-      'Piano digital de 88 teclas con acción de martillo graduado y sonidos realistas.',
-    price: 649.99,
-    stock: true,
-    imgUrl: 'https://example.com/images/yamaha-p125.jpg',
-  },
-  {
-    id: 'p3',
-    name: 'Pearl Roadshow Drum Set',
-    description:
-      'Batería acústica completa de 5 piezas, ideal para principiantes y estudiantes.',
-    price: 499.0,
-    stock: false,
-    imgUrl: 'https://example.com/images/pearl-roadshow.jpg',
-  },
-  {
-    id: 'p4',
-    name: 'Selmer Alto Saxophone',
-    description:
-      'Saxofón alto profesional con sonido cálido y mecanismo suave.',
-    price: 1899.5,
-    stock: true,
-    imgUrl: 'https://example.com/images/selmer-saxophone.jpg',
-  },
-  {
-    id: 'p5',
-    name: 'Ibanez SR300E',
-    description:
-      'Bajo eléctrico activo de 4 cuerdas con ecualizador de 3 bandas y cuerpo ergonómico.',
-    price: 349.99,
-    stock: false,
-    imgUrl: 'https://example.com/images/ibanez-sr300e.jpg',
-  },
-];
 @Injectable()
 export class ProductsRepository {
-  async getProducts() {
-    return await products;
+  constructor(
+    @InjectRepository(Products)
+    private productsRepository: Repository<Products>,
+    @InjectRepository(Categories)
+    private categoriesRepository: Repository<Categories>,
+  ) {}
+
+  async getProducts(page: number, limit: number): Promise<Products[]> {
+    let products = await this.productsRepository.find({
+      relations: {
+        category: true,
+      },
+    });
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    products = products.slice(start, end);
+
+    return products;
+  }
+  async getProduct(id: string) {
+    const product = await this.productsRepository.findOneBy({ id });
+    if (!product) {
+      return `Producto con id ${id} no encontrado`;
+    }
+    return product;
+  }
+
+  async addProducts() {
+    const categories = await this.categoriesRepository.find();
+    await Promise.all(
+      data.map(async (element) => {
+        const category = categories.find(
+          (category) => category.name === element.category,
+        );
+        if (!category)
+          throw new Error(`La categoria ${element.category} no existe`);
+
+        const product = new Products();
+        product.name = element.name;
+        product.description = element.description;
+        product.price = element.price;
+        product.stock = element.stock;
+        product.category = category;
+        await this.productsRepository
+          .createQueryBuilder()
+          .insert()
+          .into(Products)
+          .values(product)
+          .orUpdate(['description', 'price', 'imgUrl', 'stock'], ['name'])
+          .execute();
+      }),
+    );
+    return 'Productos agregados';
+  }
+  async updateProduct(id: string, product: Products) {
+    await this.productsRepository.update(id, product);
+    const updateProduct = await this.productsRepository.findOneBy({
+      id,
+    });
+    return updateProduct;
   }
 }
