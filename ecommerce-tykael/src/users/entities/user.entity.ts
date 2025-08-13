@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Orders } from './orders.entity';
+import { Orders } from 'src/orders/entities/orders.entity';
 
 @Entity({
   name: 'USERS',
@@ -31,7 +31,7 @@ export class Users {
 
   @Column({
     type: 'varchar',
-    length: 20,
+    length: 60,
     nullable: false,
   })
   password: string;

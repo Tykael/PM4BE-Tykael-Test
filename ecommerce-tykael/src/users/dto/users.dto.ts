@@ -1,6 +1,6 @@
 import {
-  IsBoolean,
   IsEmail,
+  IsEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,8 +9,10 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  Validate,
 } from 'class-validator';
-import { Orders } from 'src/entities/orders.entity';
+import { MatchPassword } from 'src/decorators/matchPassword.decorator';
+import { Orders } from 'src/orders/entities/orders.entity';
 
 export class CreateUserDto {
   id: string;
@@ -46,6 +48,10 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
+  @Validate(MatchPassword, ['password'])
+  confirmPassword: string;
+
+  @IsNotEmpty()
   @IsNumber()
   phone: number;
 
@@ -63,7 +69,7 @@ export class CreateUserDto {
   @MaxLength(50)
   city: string;
 
-  @IsBoolean()
+  @IsEmpty()
   isAdmin: boolean;
 }
 
@@ -106,6 +112,9 @@ export class UpdateUserDto {
   @MinLength(5)
   @MaxLength(20)
   city: string;
+
+  @IsEmpty()
+  isAdmin: boolean;
 }
 
 export class LoginUserDto {

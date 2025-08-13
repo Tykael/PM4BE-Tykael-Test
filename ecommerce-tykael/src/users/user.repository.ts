@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from 'src/entities/user.entity';
+import { Users } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UsersRepository {
       skip: skip,
     });
 
-    return users.map(({ password, ...userNoPassword }) => userNoPassword);
+    return users.map(({ password, isAdmin, ...filteredUser }) => filteredUser);
   }
 
   async getUserById(id: string) {
@@ -32,9 +32,15 @@ export class UsersRepository {
     return userNoPassword;
   }
 
-  async addUser(user: Users) {
+  async addUser(user: Partial<Users>) {
     const newUser = await this.usersRepository.save(user);
-    const { password, ...userNoPassword } = newUser;
+
+    const dbUser = await this.usersRepository.findOneBy({
+      id: newUser.id,
+    });
+    if (!dbUser)
+      throw new Error(`No se encontro el usuario con id ${newUser.id}`);
+    const { password, ...userNoPassword } = dbUser;
     return userNoPassword;
   }
 
