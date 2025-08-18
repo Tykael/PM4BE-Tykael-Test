@@ -17,11 +17,13 @@ import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @ApiBearerAuth()
   @Get()
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -30,18 +32,16 @@ export class UsersController {
       return this.userService.getUsers(Number(page), Number(limit));
     return this.userService.getUsers(1, 5);
   }
+
+  @ApiBearerAuth()
   @Get(`:id`)
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   getUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.getUserById(id);
   }
-  // @HttpCode(201)
-  // @Post()
-  // addUser(@Body() user: CreateUserDto) {
-  //   return this.userService.addUser(user);
-  // }
 
+  @ApiBearerAuth()
   @Put(':id')
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -52,9 +52,10 @@ export class UsersController {
     return this.userService.updateUser(id, user);
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
   @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard)
   deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
   }

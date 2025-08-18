@@ -61,7 +61,7 @@ export class ProductsRepository {
     );
     return 'Productos agregados';
   }
-  async updateProduct(id: string, product: Products) {
+  async updateProduct(id: string, product: Partial<Products>) {
     await this.productsRepository.update(id, product);
     const updateProduct = await this.productsRepository.findOneBy({
       id,

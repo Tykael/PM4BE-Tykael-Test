@@ -8,14 +8,22 @@ import {
 } from 'typeorm';
 import { Users } from 'src/users/entities/user.entity';
 import { OrderDetails } from './orderdetails.entity';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 
 @Entity({
   name: 'ORDERS',
 })
 export class Orders {
+  @ApiProperty({
+    description: 'UUID v4 Generado por la BBDD',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({
+    description: 'Fecha en formato dd/mm/yy',
+    example: '12/08/2025',
+  })
   @Column()
   date: Date;
 

@@ -6,16 +6,51 @@ import {
   ParseFilePipe,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/auth/roles.enum';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('files')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Post('uploadImage/:id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Cargar imagen para un producto' })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'La imagen fue cargada correctamente',
+  })
+  @ApiResponse({ status: 400, description: 'Carga fallida' })
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @Param('id') productId: string,

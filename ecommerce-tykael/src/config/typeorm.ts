@@ -20,3 +20,5 @@ const config = {
 export const typeOrmConfig = registerAs('typeorm', () => config);
 
 export const connectionStatus = new DataSource(config as DataSourceOptions);
+
+export const connectionSource = new DataSource(config as DataSourceOptions);

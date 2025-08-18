@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEmpty,
@@ -15,8 +16,15 @@ import { MatchPassword } from 'src/decorators/matchPassword.decorator';
 import { Orders } from 'src/orders/entities/orders.entity';
 
 export class CreateUserDto {
+  @ApiHideProperty()
   id: string;
+  @ApiHideProperty()
   orders: Orders[];
+
+  /**
+   * Debe ser un string de entre 3 y 50 caracteres
+   * @example 'Test User 01'
+   */
 
   @IsNotEmpty()
   @IsString()
@@ -24,10 +32,20 @@ export class CreateUserDto {
   @MaxLength(50)
   name: string;
 
+  /**
+   * Debe ser un email con formato valido
+   * @example 'testuser01@test.com'
+   */
+
   @IsNotEmpty({ message: 'El email es requerido' })
   @IsEmail()
   @MaxLength(50)
   email: string;
+
+  /**
+   * Debe ser un contener una mininuscula, una mayuscula y un caracter especial, de entre 8 y 15 caracteres
+   * @example 'AaBbCc12#'
+   */
 
   @IsNotEmpty()
   @IsStrongPassword(
@@ -47,28 +65,52 @@ export class CreateUserDto {
   @MinLength(8)
   password: string;
 
+  /**
+   * Debe ser igual al password
+   * @example 'AaBbCc12#'
+   */
+
   @IsNotEmpty()
   @Validate(MatchPassword, ['password'])
   confirmPassword: string;
+
+  /**
+   * Debe ser un numero
+   * @example '123456789'
+   */
 
   @IsNotEmpty()
   @IsNumber()
   phone: number;
 
-  admin: boolean;
+  /**
+   * Debe tener entre 3 y 80 caracteres
+   * @example 'Test Address'
+   */
 
   @MinLength(3)
   @MaxLength(80)
   address: string;
 
+  /**
+   * Debe tener entre 3 y 20 caracteres
+   * @example 'Test Country'
+   */
+
   @MinLength(5)
   @MaxLength(50)
   country: string;
+
+  /**
+   * Debe tener entre 3 y 20 caracteres
+   * @example 'Test City'
+   */
 
   @MinLength(5)
   @MaxLength(50)
   city: string;
 
+  @ApiHideProperty()
   @IsEmpty()
   isAdmin: boolean;
 }
@@ -118,18 +160,30 @@ export class UpdateUserDto {
 }
 
 export class LoginUserDto {
+  /**
+   * Debe ser un email con formato valido
+   * @example 'testuser01@test.com'
+   */
+
   @IsNotEmpty({
-    message: 'El email es requerido',
+    message: 'email no puede ser vacio',
   })
   @MaxLength(50)
   @IsEmail()
   email: string;
 
-  @MinLength(10, {
-    message: 'La contraseña debe tener al menos 10 caracteres.',
+  /**
+   * Debe ser igual al password
+   * @example 'AaBbCc12#'
+   */
+  @IsNotEmpty({
+    message: 'la contraseña no puede ser vacio',
   })
   @MinLength(8, {
-    message: 'La contraseña debe tener al menos 10 caracteres.',
+    message: 'La contraseña debe tener al menos 8 caracteres.',
+  })
+  @MaxLength(15, {
+    message: 'La contraseña no debe superar los 15 caracteres.',
   })
   @Matches(/.*[a-z].*/, {
     message: 'La contraseña debe contener al menos una letra minuscula.',
@@ -143,7 +197,5 @@ export class LoginUserDto {
   @Matches(/.*[!@#\$%\^\&*\)\(+=,_-].*/, {
     message: 'La contraseña debe contener al menos un caracter especial.',
   })
-  @MinLength(8)
-  @MaxLength(15)
   password: string;
 }

@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import ENV from 'config/enviroment';
+import ENV from 'src/config/enviroment';
 import { Observable } from 'rxjs';
 import { Role } from '../roles.enum';
 
