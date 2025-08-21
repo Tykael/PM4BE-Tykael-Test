@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Orders } from 'src/orders/entities/orders.entity';
+import { Role } from 'src/auth/roles.enum';
 
 @Entity({
   name: 'USERS',
@@ -42,9 +43,11 @@ export class Users {
   phone: number;
 
   @Column({
-    default: false,
+    type: 'enum',
+    enum: Role,
+    default: Role.User,
   })
-  isAdmin: boolean;
+  role: Role;
 
   @Column({
     type: 'varchar',

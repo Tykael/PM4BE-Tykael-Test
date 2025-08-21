@@ -2,6 +2,7 @@ import { ApiHideProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEmpty,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -12,6 +13,7 @@ import {
   MinLength,
   Validate,
 } from 'class-validator';
+import { Role } from 'src/auth/roles.enum';
 import { MatchPassword } from 'src/decorators/matchPassword.decorator';
 import { Orders } from 'src/orders/entities/orders.entity';
 
@@ -109,10 +111,6 @@ export class CreateUserDto {
   @MinLength(5)
   @MaxLength(50)
   city: string;
-
-  @ApiHideProperty()
-  @IsEmpty()
-  isAdmin: boolean;
 }
 
 export class UpdateUserDto {
@@ -154,9 +152,6 @@ export class UpdateUserDto {
   @MinLength(5)
   @MaxLength(20)
   city: string;
-
-  @IsEmpty()
-  isAdmin: boolean;
 }
 
 export class LoginUserDto {

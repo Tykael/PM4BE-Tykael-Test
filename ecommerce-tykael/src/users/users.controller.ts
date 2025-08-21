@@ -25,7 +25,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.SuperAdmin)
   @UseGuards(AuthGuard, RolesGuard)
   getUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
     if (page && limit)
@@ -35,7 +35,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @Get(`:id`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.SuperAdmin)
   @UseGuards(AuthGuard, RolesGuard)
   getUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.getUserById(id);
@@ -43,7 +43,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @Put(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.SuperAdmin)
   @UseGuards(AuthGuard, RolesGuard)
   updateUser(
     @Param('id', ParseUUIDPipe) id: string,
@@ -54,7 +54,7 @@ export class UsersController {
 
   @ApiBearerAuth()
   @Delete(':id')
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.SuperAdmin)
   @UseGuards(AuthGuard)
   deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
