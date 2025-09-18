@@ -15,6 +15,7 @@ import {
 } from 'class-validator';
 import { Role } from 'src/auth/roles.enum';
 import { MatchPassword } from 'src/decorators/matchPassword.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
 import { Orders } from 'src/orders/entities/orders.entity';
 
 export class CreateUserDto {
@@ -193,4 +194,9 @@ export class LoginUserDto {
     message: 'La contraseña debe contener al menos un caracter especial.',
   })
   password: string;
+}
+
+export class UpdateUserRoleDto {
+  @IsEnum(Role, { message: 'El rol debe ser valido: User, Admin, SuperAdmin' })
+  role: Role;
 }

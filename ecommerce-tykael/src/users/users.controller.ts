@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -13,7 +14,11 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CreateUserDto, UpdateUserDto } from './dto/users.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UpdateUserRoleDto,
+} from './dto/users.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -58,5 +63,17 @@ export class UsersController {
   @UseGuards(AuthGuard)
   deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
+  }
+
+  @ApiBearerAuth()
+  @Patch(':id/role')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SuperAdmin)
+  async updateUserRole(
+    @Param('id')
+    id: string,
+    @Body() updateUserRoleDto: UpdateUserRoleDto,
+  ) {
+    return this.userService.updateUserRole(id, updateUserRoleDto);
   }
 }

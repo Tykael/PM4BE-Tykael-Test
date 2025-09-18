@@ -63,4 +63,12 @@ export class UsersRepository {
   async getUserByEmail(email: string) {
     return await this.usersRepository.findOneBy({ email });
   }
+
+  findOneBy(where: object) {
+    return this.usersRepository.findOne({ where });
+  }
+
+  save(user: Users) {
+    return this.usersRepository.save(user);
+  }
 }

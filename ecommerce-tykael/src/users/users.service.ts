@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './user.repository';
 import { Users } from './entities/user.entity';
+import { UpdateUserRoleDto } from './dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,5 +25,19 @@ export class UsersService {
 
   deleteUser(id: string) {
     return this.usersRepository.deleteUser(id);
+  }
+
+  async updateUserRole(
+    id: string,
+    updateUserRoleDto: UpdateUserRoleDto,
+  ): Promise<Users> {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    user.role = updateUserRoleDto.role;
+    return this.usersRepository.save(user);
   }
 }
